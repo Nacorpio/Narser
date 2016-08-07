@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Narser.API.Parser;
 using Narser.API.Parser.Syntax;
@@ -24,12 +23,11 @@ namespace Narser
                 .ToArray();
 
             var syntax = (SyntaxDefNode) nodes.FirstOrDefault(x => x is SyntaxDefNode);
-            var keywords = tokens.FirstOrDefault(x => x.Name == "KEYWORD");
-            var operators = tokens.FirstOrDefault(x => x.Name == "OPERATOR");
 
-            var kwUsing = keywords?["using"];
             var rlAlphaOrDigit = syntax?["alpha-or-digit"];
-            var rlWhitespace = syntax?["whitespace"];
+
+            var binaryExp = rlAlphaOrDigit?.GetDeclaration()
+                .AsBinaryExpression();
         }
     }
 }

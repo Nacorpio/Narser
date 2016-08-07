@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="Parser\Extensions\ParseExtensions.cs" />
     <Compile Include="Parser\Lexer.cs" />
+    <Compile Include="Parser\Syntax\Declarations\Components\BinaryExpressionComponent.cs" />
     <Compile Include="Parser\Syntax\Declarations\Components\CharacterClassComponent.cs" />
     <Compile Include="Parser\Syntax\Declarations\Components\CharLiteralComponent.cs" />
     <Compile Include="Parser\Syntax\Declarations\Components\ComponentBase.cs" />

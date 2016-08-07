@@ -208,7 +208,7 @@ namespace Narser.API.Parser.Syntax
             RuleDefDeclaration decl;
             tokens.Parse(out decl);
 
-            output = new RuleDefNode(name, decl)
+            output = new RuleDefNode(name, decl, start)
             {
                 Parent = parent,
                 Token = start

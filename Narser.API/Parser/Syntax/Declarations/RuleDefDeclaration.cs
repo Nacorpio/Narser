@@ -1,22 +1,43 @@
 ﻿using System.Collections.Generic;
+using Narser.API.Parser.Extensions;
 using Narser.API.Parser.Syntax.Declarations.Components;
 
 namespace Narser.API.Parser.Syntax.Declarations
 {
+    /// <summary>
+    /// Represents the declaration of a <see cref="Nodes.RuleDefNode"/>.
+    /// </summary>
     public class RuleDefDeclaration : DeclarationBase
     {
+        private readonly Queue<ComponentBase> _components;
+
         /// <summary>
         /// Initializes an instance of the <see cref="RuleDefDeclaration"/> class.
         /// </summary>
         /// <param name="components">The components.</param>
         internal RuleDefDeclaration(IEnumerable<ComponentBase> components)
         {
-            Components = new Queue<ComponentBase>(components);
+            _components = new Queue<ComponentBase>(components);
         }
 
         /// <summary>
-        /// Gets the components of the <see cref="RuleDefDeclaration"/>.
+        /// Returns the <see cref="RuleDefDeclaration"/> as a binary expression.
         /// </summary>
-        public Queue<ComponentBase> Components { get; internal set; }
+        /// <returns></returns>
+        public BinaryExpressionComponent AsBinaryExpression()
+        {
+            BinaryExpressionComponent expression;
+
+            return !new Queue<ComponentBase>(GetComponents()).Parse(out expression) ?
+                null : expression;
+        }
+
+        /// <summary>
+        /// Returns the components of the <see cref="RuleDefDeclaration"/>.
+        /// </summary>
+        public IEnumerable<ComponentBase> GetComponents()
+        {
+            return _components;
+        }
     }
 }
