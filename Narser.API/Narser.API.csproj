@@ -49,7 +49,6 @@
     <Compile Include="Parser\Syntax\Declarations\Components\Compounds\CompoundComponent.cs" />
     <Compile Include="Parser\Syntax\Declarations\Components\IdentifierComponent.cs" />
     <Compile Include="Parser\Syntax\Declarations\Components\OperatorComponent.cs" />
-    <Compile Include="Parser\Syntax\Declarations\Components\RefComponent.cs" />
     <Compile Include="Parser\Syntax\Declarations\Components\StringLiteralComponent.cs" />
     <Compile Include="Parser\Syntax\Declarations\DeclarationBase.cs" />
     <Compile Include="Parser\Syntax\Declarations\RuleDefDeclaration.cs" />

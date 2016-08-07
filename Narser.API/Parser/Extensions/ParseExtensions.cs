@@ -63,7 +63,7 @@ namespace Narser.API.Parser.Extensions
 
                 case TokenKind.At:
                 {
-                    RefComponent component;
+                    IdentifierComponent component;
                     if (!Parse(queue, out component))
                     {
                         output = null;
@@ -174,32 +174,10 @@ namespace Narser.API.Parser.Extensions
         /// <returns></returns>
         public static bool Parse(this TQueue queue, out IdentifierComponent output)
         {
-            if (queue.Peek().Kind != TokenKind.Identifier)
-            {
-                output = null;
-                return false;
-            }
+            var isReference = queue.Peek().Kind == TokenKind.At;
 
-            output = new IdentifierComponent((string) queue.Dequeue().Value);
-            return true;
-        }
-
-        /// <summary>
-        /// Parses a reference component using the specific token queue.
-        /// </summary>
-        /// <param name="queue">A queue of tokens.</param>
-        /// <param name="output">The resulting reference component.</param>
-        /// <returns></returns>
-        public static bool Parse(this TQueue queue, out RefComponent output)
-        {
-            if (queue.Peek().Kind != TokenKind.At)
-            {
-                output = null;
-                return false;
-            }
-
-            // Move past the reference symbol.
-            queue.Dequeue();
+            if (isReference)
+                queue.Dequeue();
 
             if (queue.Peek().Kind != TokenKind.Identifier)
             {
@@ -207,10 +185,14 @@ namespace Narser.API.Parser.Extensions
                 return false;
             }
 
-            output = new RefComponent((string) queue.Dequeue().Value);
+            output = new IdentifierComponent((string) queue.Dequeue().Value)
+            {
+                IsReference = isReference
+            };
+
             return true;
         }
-
+        
         /// <summary>
         /// Parses a character class component using the specific token queue.
         /// </summary>

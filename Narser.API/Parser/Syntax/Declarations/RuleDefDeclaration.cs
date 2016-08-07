@@ -9,7 +9,7 @@ namespace Narser.API.Parser.Syntax.Declarations
     /// </summary>
     public class RuleDefDeclaration : DeclarationBase
     {
-        private readonly Queue<ComponentBase> _components;
+        private readonly IEnumerable<ComponentBase> _components;
 
         /// <summary>
         /// Initializes an instance of the <see cref="RuleDefDeclaration"/> class.
@@ -17,7 +17,7 @@ namespace Narser.API.Parser.Syntax.Declarations
         /// <param name="components">The components.</param>
         internal RuleDefDeclaration(IEnumerable<ComponentBase> components)
         {
-            _components = new Queue<ComponentBase>(components);
+            _components = components;
         }
 
         /// <summary>

@@ -1,3 +1,5 @@
+using Narser.API.Parser.Syntax.Declarations.Components.Compounds;
+
 namespace Narser.API.Parser.Syntax.Declarations.Components
 {
     /// <summary>

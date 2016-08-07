@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
-namespace Narser.API.Parser.Syntax.Declarations.Components
+namespace Narser.API.Parser.Syntax.Declarations.Components.Compounds
 {
     /// <summary>
     /// Represents a component that contains child components.
@@ -20,5 +21,12 @@ namespace Narser.API.Parser.Syntax.Declarations.Components
         /// Gets the child components of the <see cref="CompoundComponent"/>.
         /// </summary>
         public IEnumerable<ComponentBase> Children { get; internal set; }
+
+        /// <summary>
+        /// Gets a child at a specific index in the <see cref="CompoundComponent"/>.
+        /// </summary>
+        /// <param name="index">The zero-based index.</param>
+        /// <returns></returns>
+        public ComponentBase this[int index] => Children.ToArray()[index];
     }
 }
