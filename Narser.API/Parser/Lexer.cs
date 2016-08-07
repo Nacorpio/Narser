@@ -59,10 +59,11 @@ namespace Narser.API.Parser
                 {
                     case '\n':
                     {
+                        Read();
+
                         _line++;
                         _col = 1;
 
-                        Read();
                         break;
                     }
 

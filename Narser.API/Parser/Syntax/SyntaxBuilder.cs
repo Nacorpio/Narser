@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Narser.API.Parser.Extensions;
+using Narser.API.Parser.Syntax.Declarations;
 using Narser.API.Parser.Syntax.Nodes;
 
 namespace Narser.API.Parser.Syntax
@@ -42,6 +45,32 @@ namespace Narser.API.Parser.Syntax
         }
 
         /// <summary>
+        /// Expects a specific <see cref="TokenKind"/> predicate.
+        /// </summary>
+        /// <param name="predicate">The predicate to match.</param>
+        /// <param name="advance">Whether to advance if successful.</param>
+        private void Expect(Predicate<TokenKind> predicate, bool advance = true)
+        {
+            if (!predicate(Peek().Kind))
+            {
+                throw new Exception($"Unexpected token '{Peek().Kind}'.");
+            }
+
+            if (advance)
+                Next();
+        }
+
+        /// <summary>
+        /// Expects a specific <see cref="TokenKind"/>
+        /// </summary>
+        /// <param name="kind">The kind to expect.</param>
+        /// <param name="advance">Whether to advance if successful.</param>
+        private void Expect(TokenKind kind, bool advance = true)
+        {
+            Expect(tokenKind => tokenKind == kind, advance);
+        }
+
+        /// <summary>
         /// Builds of nodes using the tokens of the <see cref="SyntaxBuilder"/>.
         /// </summary>
         /// <returns></returns>
@@ -63,16 +92,59 @@ namespace Narser.API.Parser.Syntax
 
                     case TokenKind.KeywordTokenDef:
                     {
-                        Next();
+                        ParseTokenDef(ref node);
                         break;
                     }
                 }
 
                 if (node != null)
+                {
                     nodes.Enqueue(node);
+                    node = null;
+                }
             }
 
             return nodes;
+        }
+
+        /// <summary>
+        /// Parses a token definition at the current position.
+        /// </summary>
+        /// <param name="output">The resulting token definition.</param>
+        /// <returns></returns>
+        public bool ParseTokenDef(ref SyntaxNode output)
+        {
+            var start = Peek();
+
+            Expect(TokenKind.KeywordTokenDef);
+            Expect(TokenKind.Identifier, false);
+
+            var name = (string) Next().Value;
+            var isInheriting = Peek().Kind == TokenKind.Identifier;
+
+            string inheritance = null;
+
+            if (isInheriting)
+                inheritance = (string) Next().Value;
+
+            Expect(TokenKind.RCurlyBrace);
+
+            var rules = new Collection<RuleDefNode>();
+
+            SyntaxNode rule;
+            while (ParseRuleDef(output, out rule))
+                rules.Add((RuleDefNode)rule);
+
+            Expect(TokenKind.LCurlyBrace);
+            Expect(TokenKind.Semicolon);
+
+            output = new TokenDefNode(name, rules)
+            {
+                Token = start,
+                Inheritance = inheritance
+            };
+
+            return true;
         }
 
         /// <summary>
@@ -82,16 +154,65 @@ namespace Narser.API.Parser.Syntax
         /// <returns>True if the operation was successful; otherwise false.</returns>
         public bool ParseSyntaxDef(ref SyntaxNode output)
         {
-            if (Peek().Kind != TokenKind.KeywordSyntaxDef)
+            var start = Peek();
+
+            Expect(TokenKind.KeywordSyntaxDef);
+            Expect(TokenKind.Identifier, false);
+
+            var name = (string) Next().Value;
+
+            Expect(TokenKind.RCurlyBrace);
+
+            var rules = new Collection<RuleDefNode>();
+
+            SyntaxNode rule;
+            while (ParseRuleDef(output, out rule))
+                rules.Add((RuleDefNode) rule);
+
+            Expect(TokenKind.LCurlyBrace);
+            Expect(TokenKind.Semicolon);
+
+            output = new SyntaxDefNode(name, rules)
+            {
+                Token = start
+            };
+
+            return true;
+        }
+
+        /// <summary>
+        /// Parses a rule definition at the current position.
+        /// </summary>
+        /// <param name="parent">The parental node.</param>
+        /// <param name="output">The resulting rule definition.</param>
+        /// <returns></returns>
+        public bool ParseRuleDef(SyntaxNode parent, out SyntaxNode output)
+        {
+            if (Peek().Kind != TokenKind.Identifier &&
+                Peek().Kind != TokenKind.StringLiteral &&
+                Peek().Kind != TokenKind.CharLiteral)
+            {
+                output = null;
                 return false;
+            }
+
+            var start = Peek();
+            var name = (string) Next().Value;
+
+            var tokens = new Queue<Token<TokenKind>>();
+            while (Peek().Kind != TokenKind.Semicolon)
+                tokens.Enqueue(Next());
 
             Next();
 
-            if (Peek().Kind != TokenKind.Identifier)
-                return false;
+            RuleDefDeclaration decl;
+            tokens.Parse(out decl);
 
-            var name = (string) Next().Value;
-            output = new SyntaxDefNode(name);
+            output = new RuleDefNode(name, decl)
+            {
+                Parent = parent,
+                Token = start,
+            };
 
             return true;
         }

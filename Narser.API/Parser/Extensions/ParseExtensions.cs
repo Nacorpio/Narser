@@ -1,4 +1,6 @@
-﻿using Narser.API.Parser.Syntax.Declarations.Components;
+﻿using System.Collections.ObjectModel;
+using Narser.API.Parser.Syntax.Declarations;
+using Narser.API.Parser.Syntax.Declarations.Components;
 using TQueue = System.Collections.Generic.Queue<Narser.API.Parser.Token<Narser.API.Parser.TokenKind>>;
 
 namespace Narser.API.Parser.Extensions
@@ -14,36 +16,83 @@ namespace Narser.API.Parser.Extensions
         /// <param name="queue">A queue of tokens.</param>
         /// <param name="output">The resulting component.</param>
         /// <returns></returns>
-        public static bool Parse(this TQueue queue, ref ComponentBase output)
+        public static bool Parse(this TQueue queue, out ComponentBase output)
         {
             switch (queue.Peek().Kind)
             {
                 case TokenKind.StringLiteral:
                 {
                     StringLiteralComponent component;
-                    return Parse(queue, out component);
+                    if (!Parse(queue, out component))
+                    {
+                        output = null;
+                        return false;
+                    }
+
+                    output = component;
+                    return true;
                 }
 
                 case TokenKind.CharLiteral:
                 {
                     CharLiteralComponent component;
-                    return Parse(queue, out component);
+                    if (!Parse(queue, out component))
+                    {
+                        output = null;
+                        return false;
+                    }
+
+                    output = component;
+                    return true;
                 }
 
                 case TokenKind.CharacterClass:
                 {
                     CharacterClassComponent component;
-                    return Parse(queue, out component);
+                    if (!Parse(queue, out component))
+                    {
+                        output = null;
+                        return false;
+                    }
+
+                    output = component;
+                    return true;
                 }
 
                 case TokenKind.Identifier:
                 {
                     RefComponent component;
-                    return Parse(queue, out component);
+                    if (!Parse(queue, out component))
+                    {
+                        output = null;
+                        return false;
+                    }
+
+                    output = component;
+                    return true;
                 }
             }
 
+            output = null;
             return false;
+        }
+
+        /// <summary>
+        /// Parses a declaration using the specific token queue.
+        /// </summary>
+        /// <param name="queue">A queue of tokens.</param>
+        /// <param name="output">The resulting declaration.</param>
+        /// <returns></returns>
+        public static bool Parse(this TQueue queue, out RuleDefDeclaration output)
+        {
+            var components = new Collection<ComponentBase>();
+            ComponentBase component;
+
+            while (queue.Count > 0 && queue.Parse(out component))
+                components.Add(component);
+
+            output = new RuleDefDeclaration(components);
+            return true;
         }
 
         /// <summary>
@@ -114,7 +163,7 @@ namespace Narser.API.Parser.Extensions
                 return false;
             }
 
-            output = new CharLiteralComponent(char.Parse((string) queue.Dequeue().Value));
+            output = new CharLiteralComponent((string) queue.Dequeue().Value);
             return true;
         }
     }

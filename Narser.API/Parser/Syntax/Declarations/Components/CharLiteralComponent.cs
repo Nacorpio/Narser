@@ -9,7 +9,7 @@
         /// Initializes an instance of the <see cref="CharLiteralComponent"/> class.
         /// </summary>
         /// <param name="value">The value.</param>
-        internal CharLiteralComponent(char value)
+        internal CharLiteralComponent(string value)
         {
             Value = value;
         }
@@ -17,6 +17,6 @@
         /// <summary>
         /// Gets the value of the <see cref="CharLiteralComponent"/>.
         /// </summary>
-        public char Value { get; internal set; }
+        public string Value { get; internal set; }
     }
 }

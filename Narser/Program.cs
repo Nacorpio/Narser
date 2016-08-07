@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using Narser.API.Parser;
 using Narser.API.Parser.Syntax;
+using Narser.API.Parser.Syntax.Nodes;
 
 namespace Narser
 {
@@ -12,9 +13,15 @@ namespace Narser
         {
             const string path = "example.par";
 
-            var lexer = new Lexer(new StringReader(new StreamReader(File.OpenRead(path)).ReadToEnd()));
+            Lexer lexer;
+            using (var reader = new StreamReader(File.OpenRead(path)))
+                lexer = new Lexer(new StringReader(reader.ReadToEnd()));
+
             var builder = new SyntaxBuilder(lexer.Tokenize());
             var nodes = builder.Build();
+
+            var syntax = (SyntaxDefNode) nodes.First(x => x is SyntaxDefNode);
+            var alpha = syntax["alpha"];
         }
     }
 }

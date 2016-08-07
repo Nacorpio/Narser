@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Narser.API.Parser.Syntax.Declarations.Components;
 
 namespace Narser.API.Parser.Syntax.Declarations
 {
@@ -7,17 +8,15 @@ namespace Narser.API.Parser.Syntax.Declarations
         /// <summary>
         /// Initializes an instance of the <see cref="RuleDefDeclaration"/> class.
         /// </summary>
-        /// <param name="tokens">The underlying tokens.</param>
-        internal RuleDefDeclaration(Queue<Token> tokens) : base(tokens)
+        /// <param name="components">The components.</param>
+        internal RuleDefDeclaration(IEnumerable<ComponentBase> components)
         {
-            Parse();
+            Components = components;
         }
 
         /// <summary>
-        /// Parses the declaration tokens to form a collection of declaration components.
+        /// Gets the components of the <see cref="RuleDefDeclaration"/>.
         /// </summary>
-        private void Parse()
-        {
-        }
+        public IEnumerable<ComponentBase> Components { get; internal set; }
     }
 }
