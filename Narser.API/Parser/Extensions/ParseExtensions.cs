@@ -144,7 +144,7 @@ namespace Narser.API.Parser.Extensions
             var op = (OperatorComponent) queue.Dequeue();
             var right = queue.Dequeue();
 
-            output = new BinaryExpressionComponent(left, op.Operator, right);
+            output = new BinaryExpressionComponent(left, op, right);
             return true;
         }
 

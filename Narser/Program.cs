@@ -22,12 +22,6 @@ namespace Narser
             var tokens = nodes.Where(x => x is TokenDefNode).Cast<TokenDefNode>()
                 .ToArray();
 
-            var syntax = (SyntaxDefNode) nodes.FirstOrDefault(x => x is SyntaxDefNode);
-
-            var rlAlphaOrDigit = syntax?["alpha-or-digit"];
-
-            var binaryExp = rlAlphaOrDigit?.GetDeclaration()
-                .AsBinaryExpression();
         }
     }
 }
