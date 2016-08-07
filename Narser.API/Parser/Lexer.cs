@@ -46,12 +46,12 @@ namespace Narser.API.Parser
         public Queue<BaseToken> Tokenize()
         {
             var tokens = new Queue<Token<TokenKind>>();
-            while (_reader.Peek() != -1)
+            while (!IsAtEnd())
             {
-                while (char.IsWhiteSpace((char) _reader.Peek()))
+                while ((char) _reader.Peek() == ' ')
                     Read();
 
-                if (_reader.Peek() == -1)
+                if (IsAtEnd())
                     break;
 
                 var c = (char) _reader.Peek();
@@ -484,6 +484,7 @@ namespace Narser.API.Parser
         internal bool ParseKeyword(out BaseToken output)
         {
             var sb = new StringBuilder();
+            var start = GetLocation();
 
             while (char.IsLetter((char) _reader.Peek()) || IdentifierWhitelist.Contains((char) _reader.Peek()))
                 sb.Append((char) Read());
@@ -518,7 +519,12 @@ namespace Narser.API.Parser
             if (sb.Length == 0)
                 kind = TokenKind.Undefined;
 
-            output = new Token<TokenKind>(value, GetLocation(), kind);
+            output = new Token<TokenKind>(value, start, kind)
+            {
+                Length = sb.Length,
+                End = GetLocation()
+            };
+
             return true;
         }
 

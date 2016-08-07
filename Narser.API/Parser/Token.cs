@@ -13,10 +13,10 @@ namespace Narser.API.Parser
         /// Initializes an instance of the <see cref="Token{TKind,TValue}"/> class.
         /// </summary>
         /// <param name="value">The token value.</param>
-        /// <param name="location">The location.</param>
+        /// <param name="start">The location.</param>
         /// <param name="kind">The token kind.</param>
-        public Token(TValue value, StringLocation location, TKind kind)
-            : base(value, location, kind)
+        public Token(TValue value, StringLocation start, TKind kind)
+            : base(value, start, kind)
         {
             Value = value;
         }
@@ -37,10 +37,10 @@ namespace Narser.API.Parser
         /// Initializes an instance of the <see cref="Token{TKind}"/> class.
         /// </summary>
         /// <param name="value">The token value.</param>
-        /// <param name="location">The location.</param>
+        /// <param name="start">The location.</param>
         /// <param name="kind">The token kind-</param>
-        public Token(object value, StringLocation location, TKind kind)
-            : base(value, location)
+        public Token(object value, StringLocation start, TKind kind)
+            : base(value, start)
         {
             Kind = kind;
         }
@@ -65,11 +65,11 @@ namespace Narser.API.Parser
         /// Initializes an instance of the <see cref="Token"/> class.
         /// </summary>
         /// <param name="value">The token value.</param>
-        /// <param name="location">The location.</param>
-        public Token(object value, StringLocation location)
+        /// <param name="start">The location.</param>
+        public Token(object value, StringLocation start)
         {
             Value = value;
-            Location = location;
+            Start = start;
             Length = 1;
         }
 
@@ -90,9 +90,14 @@ namespace Narser.API.Parser
         public int Length { get; internal set; }
 
         /// <summary>
-        /// Gets the location of the <see cref="Token"/>.
+        /// Gets the start location of the <see cref="Token"/>.
         /// </summary>
-        public StringLocation Location { get; internal set; }
+        public StringLocation Start { get; internal set; }
+
+        /// <summary>
+        /// Gets the end location of the <see cref="Token"/>.
+        /// </summary>
+        public StringLocation End { get; internal set; }
 
         /// <summary>
         /// Determines whether the left instance is equal to the right instance.
@@ -102,7 +107,7 @@ namespace Narser.API.Parser
         /// <returns></returns>
         public static bool operator ==(Token left, Token right)
         {
-            return left?.Value == right?.Value && left?.Location == right?.Location;
+            return left?.Value == right?.Value && left?.Start == right?.Start;
         }
 
         /// <summary>
@@ -124,7 +129,7 @@ namespace Narser.API.Parser
         /// <returns></returns>
         public static bool operator >(Token left, Token right)
         {
-            return left.Location > right.Location;
+            return left.Start > right.Start;
         }
 
         /// <summary>
@@ -135,12 +140,12 @@ namespace Narser.API.Parser
         /// <returns></returns>
         public static bool operator <(Token left, Token right)
         {
-            return left.Location < right.Location;
+            return left.Start < right.Start;
         }
 
         protected bool Equals(Token other)
         {
-            return Equals(Value, other.Value) && Length == other.Length && Location.Equals(other.Location);
+            return Equals(Value, other.Value) && Length == other.Length && Start.Equals(other.Start);
         }
 
         public override bool Equals(object obj)
@@ -157,7 +162,7 @@ namespace Narser.API.Parser
             {
                 var hashCode = (Value != null ? Value.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ Length;
-                hashCode = (hashCode * 397) ^ Location.GetHashCode();
+                hashCode = (hashCode * 397) ^ Start.GetHashCode();
                 return hashCode;
             }
         }

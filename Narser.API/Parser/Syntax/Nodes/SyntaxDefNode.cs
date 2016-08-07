@@ -18,6 +18,9 @@ namespace Narser.API.Parser.Syntax.Nodes
         {
             Name = name;
             Rules = rules;
+
+            foreach (var rule in Rules)
+                rule.Parent = this;
         }
 
         /// <summary>

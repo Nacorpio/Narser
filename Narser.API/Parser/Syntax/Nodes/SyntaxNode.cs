@@ -44,11 +44,6 @@ namespace Narser.API.Parser.Syntax.Nodes
         /// <summary>
         /// Gets the start location of the <see cref="SyntaxNode"/>.
         /// </summary>
-        public StringLocation Start => Token.Location;
-
-        /// <summary>
-        /// Gets the end location of the <see cref="SyntaxNode"/>.
-        /// </summary>
-        public StringLocation End { get; internal set; }
+        public StringLocation Start => Token.Start;
     }
 }
