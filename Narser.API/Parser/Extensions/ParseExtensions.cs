@@ -35,9 +35,33 @@ namespace Narser.API.Parser.Extensions
                     CharacterClassComponent component;
                     return Parse(queue, out component);
                 }
+
+                case TokenKind.Identifier:
+                {
+                    RefComponent component;
+                    return Parse(queue, out component);
+                }
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Parses a reference component using the specific token queue.
+        /// </summary>
+        /// <param name="queue">A queue of tokens.</param>
+        /// <param name="output">The resulting reference component.</param>
+        /// <returns></returns>
+        public static bool Parse(this TQueue queue, out RefComponent output)
+        {
+            if (queue.Peek().Kind != TokenKind.Identifier)
+            {
+                output = null;
+                return false;
+            }
+
+            output = new RefComponent((string) queue.Dequeue().Value);
+            return true;
         }
 
         /// <summary>
