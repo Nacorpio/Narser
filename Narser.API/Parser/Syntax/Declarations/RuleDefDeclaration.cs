@@ -11,12 +11,12 @@ namespace Narser.API.Parser.Syntax.Declarations
         /// <param name="components">The components.</param>
         internal RuleDefDeclaration(IEnumerable<ComponentBase> components)
         {
-            Components = components;
+            Components = new Queue<ComponentBase>(components);
         }
 
         /// <summary>
         /// Gets the components of the <see cref="RuleDefDeclaration"/>.
         /// </summary>
-        public IEnumerable<ComponentBase> Components { get; internal set; }
+        public Queue<ComponentBase> Components { get; internal set; }
     }
 }

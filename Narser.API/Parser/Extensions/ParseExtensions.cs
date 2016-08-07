@@ -84,6 +84,30 @@ namespace Narser.API.Parser.Extensions
                     output = component;
                     return true;
                 }
+
+                default:
+                {
+                    switch (queue.Peek().Kind)
+                    {
+                        case TokenKind.Pipe:
+                        {
+                            output = new OperatorComponent(OperatorType.BitwiseOr);
+                            queue.Dequeue();
+
+                            return true;
+                        }
+
+                        case TokenKind.Ampersand:
+                        {
+                            output = new OperatorComponent(OperatorType.BitwiseAnd);
+                            queue.Dequeue();
+
+                            return true;
+                        }
+                    }
+
+                    break;
+                }
             }
 
             output = null;

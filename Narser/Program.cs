@@ -23,10 +23,13 @@ namespace Narser
             var tokens = nodes.Where(x => x is TokenDefNode).Cast<TokenDefNode>()
                 .ToArray();
 
+            var syntax = (SyntaxDefNode) nodes.FirstOrDefault(x => x is SyntaxDefNode);
             var keywords = tokens.FirstOrDefault(x => x.Name == "KEYWORD");
             var operators = tokens.FirstOrDefault(x => x.Name == "OPERATOR");
 
             var kwUsing = keywords?["using"];
+            var rlAlphaOrDigit = syntax?["alpha-or-digit"];
+            var rlWhitespace = syntax?["whitespace"];
         }
     }
 }
