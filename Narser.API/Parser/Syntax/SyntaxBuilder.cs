@@ -71,7 +71,7 @@ namespace Narser.API.Parser.Syntax
         }
 
         /// <summary>
-        /// Builds of nodes using the tokens of the <see cref="SyntaxBuilder"/>.
+        /// Builds a tree of nodes using the tokens in the <see cref="SyntaxBuilder"/>.
         /// </summary>
         /// <returns></returns>
         public Queue<SyntaxNode> Build()

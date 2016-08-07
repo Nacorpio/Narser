@@ -20,8 +20,13 @@ namespace Narser
             var builder = new SyntaxBuilder(lexer.Tokenize());
             var nodes = builder.Build();
 
-            var syntax = (SyntaxDefNode) nodes.First(x => x is SyntaxDefNode);
-            var alpha = syntax["alpha"];
+            var tokens = nodes.Where(x => x is TokenDefNode).Cast<TokenDefNode>()
+                .ToArray();
+
+            var keywords = tokens.FirstOrDefault(x => x.Name == "KEYWORD");
+            var operators = tokens.FirstOrDefault(x => x.Name == "OPERATOR");
+
+            var kwUsing = keywords?["using"];
         }
     }
 }

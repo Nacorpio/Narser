@@ -59,9 +59,22 @@ namespace Narser.API.Parser.Extensions
                     return true;
                 }
 
-                case TokenKind.Identifier:
+                case TokenKind.At:
                 {
                     RefComponent component;
+                    if (!Parse(queue, out component))
+                    {
+                        output = null;
+                        return false;
+                    }
+
+                    output = component;
+                    return true;
+                }
+
+                case TokenKind.Identifier:
+                {
+                    IdentifierComponent component;
                     if (!Parse(queue, out component))
                     {
                         output = null;
@@ -96,6 +109,24 @@ namespace Narser.API.Parser.Extensions
         }
 
         /// <summary>
+        /// Parses an identifier component using the specific token queue.
+        /// </summary>
+        /// <param name="queue">A queue of tokens.</param>
+        /// <param name="output">The resulting identifier component.</param>
+        /// <returns></returns>
+        public static bool Parse(this TQueue queue, out IdentifierComponent output)
+        {
+            if (queue.Peek().Kind != TokenKind.Identifier)
+            {
+                output = null;
+                return false;
+            }
+
+            output = new IdentifierComponent((string) queue.Dequeue().Value);
+            return true;
+        }
+
+        /// <summary>
         /// Parses a reference component using the specific token queue.
         /// </summary>
         /// <param name="queue">A queue of tokens.</param>
@@ -103,6 +134,15 @@ namespace Narser.API.Parser.Extensions
         /// <returns></returns>
         public static bool Parse(this TQueue queue, out RefComponent output)
         {
+            if (queue.Peek().Kind != TokenKind.At)
+            {
+                output = null;
+                return false;
+            }
+
+            // Move past the reference symbol.
+            queue.Dequeue();
+
             if (queue.Peek().Kind != TokenKind.Identifier)
             {
                 output = null;
