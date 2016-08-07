@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Narser.API.Parser.Utilities;
+using BaseToken = Narser.API.Parser.Token<Narser.API.Parser.TokenKind>;
 
 namespace Narser.API.Parser
 {
@@ -42,7 +43,7 @@ namespace Narser.API.Parser
         /// Tokenizes the input in the <see cref="Lexer"/>.
         /// </summary>
         /// <returns></returns>
-        public Queue<Token<TokenKind>> Tokenize()
+        public Queue<BaseToken> Tokenize()
         {
             var tokens = new Queue<Token<TokenKind>>();
             while (_reader.Peek() != -1)
@@ -398,7 +399,7 @@ namespace Narser.API.Parser
         /// </summary>
         /// <param name="output">The output token.</param>
         /// <returns></returns>
-        internal bool ParseStringLiteral(ref Token<TokenKind> output)
+        internal bool ParseStringLiteral(ref BaseToken output)
         {
             if (_reader.Peek() != '\"')
                 return false;
@@ -425,7 +426,7 @@ namespace Narser.API.Parser
         /// </summary>
         /// <param name="output">The output token.</param>
         /// <returns></returns>
-        internal bool ParseCharLiteral(ref Token<TokenKind> output)
+        internal bool ParseCharLiteral(ref BaseToken output)
         {
             if (_reader.Peek() != '\'')
                 return false;
@@ -452,7 +453,7 @@ namespace Narser.API.Parser
         /// </summary>
         /// <param name="output">The output token.</param>
         /// <returns></returns>
-        internal bool ParseCharacterClass(ref Token<TokenKind> output)
+        internal bool ParseCharacterClass(ref BaseToken output)
         {
             if (_reader.Peek() != '[')
                 return false;
@@ -479,7 +480,7 @@ namespace Narser.API.Parser
         /// </summary>
         /// <param name="output">The output token.</param>
         /// <returns></returns>
-        internal bool ParseKeyword(out Token<TokenKind> output)
+        internal bool ParseKeyword(out BaseToken output)
         {
             var sb = new StringBuilder();
 

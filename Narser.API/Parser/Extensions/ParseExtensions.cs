@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Narser.API.Parser.Syntax.Declarations.Components;
+﻿using Narser.API.Parser.Syntax.Declarations.Components;
+using TQueue = System.Collections.Generic.Queue<Narser.API.Parser.Token<Narser.API.Parser.TokenKind>>;
 
 namespace Narser.API.Parser.Extensions
 {
@@ -9,17 +9,88 @@ namespace Narser.API.Parser.Extensions
     public static class ParseExtensions
     {
         /// <summary>
-        /// Parses a string literal component using the specific tokens queue.
+        /// Parses a component using the specific token queue.
         /// </summary>
-        /// <param name="tokens">A queue of tokens</param>
-        /// <param name="output">The resulting string literal.</param>
+        /// <param name="queue">A queue of tokens.</param>
+        /// <param name="output">The resulting component.</param>
         /// <returns></returns>
-        public static bool Parse(this Queue<Token<TokenKind>> tokens, ref StringLiteralComponent output)
+        public static bool Parse(this TQueue queue, ref ComponentBase output)
         {
-            if (tokens.Peek().Kind != TokenKind.StringLiteral)
-                return false;
+            switch (queue.Peek().Kind)
+            {
+                case TokenKind.StringLiteral:
+                {
+                    StringLiteralComponent component;
+                    return Parse(queue, out component);
+                }
 
-            output = new StringLiteralComponent((string)tokens.Dequeue().Value);
+                case TokenKind.CharLiteral:
+                {
+                    CharLiteralComponent component;
+                    return Parse(queue, out component);
+                }
+
+                case TokenKind.CharacterClass:
+                {
+                    CharacterClassComponent component;
+                    return Parse(queue, out component);
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Parses a character class component using the specific token queue.
+        /// </summary>
+        /// <param name="queue">A queue of tokens.</param>
+        /// <param name="output">The resulting character class component.</param>
+        /// <returns></returns>
+        public static bool Parse(this TQueue queue, out CharacterClassComponent output)
+        {
+            if (queue.Peek().Kind != TokenKind.CharacterClass)
+            {
+                output = null;
+                return false;
+            }
+
+            output = new CharacterClassComponent(((string) queue.Dequeue().Value).ToCharArray());
+            return true;
+        }
+
+        /// <summary>
+        /// Parses a string literal component using the specific token queue.
+        /// </summary>
+        /// <param name="queue">A queue of tokens</param>
+        /// <param name="output">The resulting string literal component.</param>
+        /// <returns></returns>
+        public static bool Parse(this TQueue queue, out StringLiteralComponent output)
+        {
+            if (queue.Peek().Kind != TokenKind.StringLiteral)
+            {
+                output = null;
+                return false;
+            }
+
+            output = new StringLiteralComponent((string) queue.Dequeue().Value);
+            return true;
+        }
+
+        /// <summary>
+        /// Parses a character literal component using the specific token queue.
+        /// </summary>
+        /// <param name="queue">A queue of tokens.</param>
+        /// <param name="output">The resulting character literal component.</param>
+        /// <returns></returns>
+        public static bool Parse(this TQueue queue, out CharLiteralComponent output)
+        {
+            if (queue.Peek().Kind != TokenKind.CharLiteral)
+            {
+                output = null;
+                return false;
+            }
+
+            output = new CharLiteralComponent(char.Parse((string) queue.Dequeue().Value));
             return true;
         }
     }

@@ -3,6 +3,12 @@
 namespace Narser.API.Parser.Syntax.Declarations.Components
 {
     /// <summary>
+    /// Represents a component flag.
+    /// </summary>
+    public enum ComponentFlag
+    { }
+
+    /// <summary>
     /// Represents a declaration component, which forms a <see cref="DeclarationBase"/>.
     /// </summary>
     public abstract class ComponentBase
@@ -12,7 +18,8 @@ namespace Narser.API.Parser.Syntax.Declarations.Components
         /// </summary>
         protected ComponentBase()
             : this(new Queue<Token>())
-        { }
+        {
+        }
 
         /// <summary>
         /// Initializes an instance of the <see cref="ComponentBase"/> class.
