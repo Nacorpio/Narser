@@ -72,5 +72,6 @@ namespace Narser.API.Parser
         KeywordOr,
         KeywordSyntaxDef,
         KeywordTokenDef,
+        Regex
     }
 }

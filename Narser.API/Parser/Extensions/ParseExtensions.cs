@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text;
 using Narser.API.Parser.Syntax.Declarations;
 using Narser.API.Parser.Syntax.Declarations.Components;
+using Narser.API.Parser.Syntax.Declarations.Components.Compounds;
 using TQueue = System.Collections.Generic.Queue<Narser.API.Parser.Token<Narser.API.Parser.TokenKind>>;
 
 namespace Narser.API.Parser.Extensions
@@ -106,6 +108,11 @@ namespace Narser.API.Parser.Extensions
 
                             return true;
                         }
+
+                        default:
+                        {
+                            break;
+                        }
                     }
 
                     break;
@@ -122,7 +129,7 @@ namespace Narser.API.Parser.Extensions
         /// <param name="queue">A queue of tokens.</param>
         /// <param name="output">The resulting binary expression component.</param>
         /// <returns></returns>
-        public static bool Parse(this Queue<ComponentBase> queue, out BinaryExpressionComponent output)
+        public static bool Parse(this Queue<ComponentBase> queue, out BinaryComponent output)
         {
             if (queue == null)
                 throw new ArgumentNullException(nameof(queue));
@@ -144,7 +151,7 @@ namespace Narser.API.Parser.Extensions
             var op = (OperatorComponent) queue.Dequeue();
             var right = queue.Dequeue();
 
-            output = new BinaryExpressionComponent(left, op, right);
+            output = new BinaryComponent(left, op, right);
             return true;
         }
 

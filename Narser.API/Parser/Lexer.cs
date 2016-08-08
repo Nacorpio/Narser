@@ -405,7 +405,7 @@ namespace Narser.API.Parser
             if (_reader.Peek() != '\"')
                 return false;
 
-            _reader.Read();
+            Read();
 
             var sb = new StringBuilder();
 
