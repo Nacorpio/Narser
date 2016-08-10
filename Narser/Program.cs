@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using Narser.API.Parser;
 using Narser.API.Parser.Syntax;
@@ -16,7 +17,9 @@ namespace Narser
             using (var reader = new StreamReader(File.OpenRead(path)))
                 lexer = new Lexer(new StringReader(reader.ReadToEnd()));
 
-            var builder = new SyntaxBuilder(lexer.Tokenize());
+            lexer.Tokenize();
+
+            var builder = new SyntaxBuilder(lexer.Tokens);
             var nodes = builder.Build();
 
             var syntax = (SyntaxDefNode) nodes.FirstOrDefault(x => x is SyntaxDefNode);
@@ -24,6 +27,8 @@ namespace Narser
                 .ToArray();
 
             var ruleAod = syntax?["alpha-or-digit"];
+
+            Console.ReadLine();
         }
     }
 }

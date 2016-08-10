@@ -7,7 +7,8 @@ namespace Narser.API.Parser
     /// </summary>
     /// <typeparam name="TKind">The kind type.</typeparam>
     /// <typeparam name="TValue">The value type.</typeparam>
-    public class Token<TKind, TValue> : Token<TKind> where TKind : struct
+    public class Token<TKind, TValue> : Token<TKind>
+        where TKind : struct
     {
         /// <summary>
         /// Initializes an instance of the <see cref="Token{TKind,TValue}"/> class.
@@ -31,7 +32,8 @@ namespace Narser.API.Parser
     /// Represents a token with a generic kind.
     /// </summary>
     /// <typeparam name="TKind">The kind type.</typeparam>
-    public class Token<TKind> : Token where TKind : struct
+    public class Token<TKind> : Token
+        where TKind : struct
     {
         /// <summary>
         /// Initializes an instance of the <see cref="Token{TKind}"/> class.
@@ -98,6 +100,12 @@ namespace Narser.API.Parser
         /// Gets the end location of the <see cref="Token"/>.
         /// </summary>
         public StringLocation End { get; internal set; }
+
+        /// <summary>
+        /// Gets the token that was tokenized previous to the <see cref="Token"/>.
+        /// </summary>
+        /// <returns>The token if there was one; otherwise null.</returns>
+        public Token Previous { get; internal set; }
 
         /// <summary>
         /// Determines whether the left instance is equal to the right instance.

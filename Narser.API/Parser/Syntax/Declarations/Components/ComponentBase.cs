@@ -1,4 +1,6 @@
-﻿namespace Narser.API.Parser.Syntax.Declarations.Components
+﻿using Narser.API.Parser.Utilities;
+
+namespace Narser.API.Parser.Syntax.Declarations.Components
 {
     /// <summary>
     /// Represents a component flag.
@@ -16,5 +18,15 @@
         /// </summary>
         protected ComponentBase()
         { }
+
+        /// <summary>
+        /// Gets the first token of the <see cref="ComponentBase"/>.
+        /// </summary>
+        public Token Token { get; internal set; }
+
+        /// <summary>
+        /// Returns the location of the <see cref="ComponentBase"/>.
+        /// </summary>
+        public StringLocation GetLocation() => Token.Start;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Narser.API.Parser.Syntax.Declarations.Components
+﻿using System.Text.RegularExpressions;
+
+namespace Narser.API.Parser.Syntax.Declarations.Components
 {
     /// <summary>
     /// Represents a string literal component.
@@ -18,5 +20,15 @@
         /// Gets the value of the <see cref="StringLiteralComponent"/>.
         /// </summary>
         public string Value { get; internal set; }
+
+        /// <summary>
+        /// Creates a regex instance with the specific flags from the value of the <see cref="StringLiteralComponent"/>.
+        /// </summary>
+        /// <param name="flags">The regex-option flags.</param>
+        /// <returns></returns>
+        public Regex CreateRegex(RegexOptions flags)
+        {
+            return new Regex(Value, flags);
+        }
     }
 }

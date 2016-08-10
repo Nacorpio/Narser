@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using Narser.API.Parser.Syntax.Declarations;
 using Narser.API.Parser.Syntax.Declarations.Components;
 using Narser.API.Parser.Syntax.Declarations.Components.Compounds;
@@ -108,11 +107,6 @@ namespace Narser.API.Parser.Extensions
 
                             return true;
                         }
-
-                        default:
-                        {
-                            break;
-                        }
                     }
 
                     break;
@@ -140,6 +134,7 @@ namespace Narser.API.Parser.Extensions
                 return true;
             }
 
+            var start = queue.Peek().Token;
             var left = queue.Dequeue();
 
             if (!(queue.Peek() is OperatorComponent))
@@ -151,7 +146,11 @@ namespace Narser.API.Parser.Extensions
             var op = (OperatorComponent) queue.Dequeue();
             var right = queue.Dequeue();
 
-            output = new BinaryComponent(left, op, right);
+            output = new BinaryComponent(left, op, right)
+            {
+               Token = start
+            };
+
             return true;
         }
 
@@ -181,6 +180,7 @@ namespace Narser.API.Parser.Extensions
         /// <returns></returns>
         public static bool Parse(this TQueue queue, out IdentifierComponent output)
         {
+            var start = queue.Peek();
             var isReference = queue.Peek().Kind == TokenKind.At;
 
             if (isReference)
@@ -194,6 +194,7 @@ namespace Narser.API.Parser.Extensions
 
             output = new IdentifierComponent((string) queue.Dequeue().Value)
             {
+                Token = start,
                 IsReference = isReference
             };
 
@@ -214,7 +215,13 @@ namespace Narser.API.Parser.Extensions
                 return false;
             }
 
-            output = new CharacterClassComponent(((string) queue.Dequeue().Value).ToCharArray());
+            var start = queue.Peek();
+
+            output = new CharacterClassComponent(((string) queue.Dequeue().Value).ToCharArray())
+            {
+                Token = start
+            };
+
             return true;
         }
 
@@ -232,7 +239,13 @@ namespace Narser.API.Parser.Extensions
                 return false;
             }
 
-            output = new StringLiteralComponent((string) queue.Dequeue().Value);
+            var start = queue.Peek();
+
+            output = new StringLiteralComponent((string) queue.Dequeue().Value)
+            {
+                Token = start
+            };
+
             return true;
         }
 
@@ -250,7 +263,13 @@ namespace Narser.API.Parser.Extensions
                 return false;
             }
 
-            output = new CharLiteralComponent((string) queue.Dequeue().Value);
+            var start = queue.Peek();
+
+            output = new CharLiteralComponent((string) queue.Dequeue().Value)
+            {
+                Token = start
+            };
+
             return true;
         }
     }

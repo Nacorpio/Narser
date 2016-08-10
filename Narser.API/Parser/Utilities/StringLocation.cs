@@ -103,5 +103,10 @@
                 return hashCode;
             }
         }
+
+        public override string ToString()
+        {
+            return $"[{Column} @ {Line}]";
+        }
     }
 }

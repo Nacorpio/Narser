@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,8 @@ namespace Narser.API.Parser
 {
     public class Lexer
     {
+        private readonly char[] _escapeSequences = {'n', 'r', 'a', 'b', 'f', 't', 'v', '\'', '"', '\\', '?'};
+
         private int _pos = 1, _col = 1, _line = 1;
         private readonly StringReader _reader;
 
@@ -18,9 +21,16 @@ namespace Narser.API.Parser
         /// <param name="reader">The reader.</param>
         public Lexer(StringReader reader)
         {
-            IdentifierWhitelist = new [] {'-', '_'};
+            IdentifierWhitelist = new[] {'-', '_'};
             _reader = reader;
+
+            Tokens = new Queue<BaseToken>();
         }
+
+        /// <summary>
+        /// Gets the resulting tokens of the <see cref="Lexer"/>.
+        /// </summary>
+        public Queue<BaseToken> Tokens { get; }
 
         /// <summary>
         /// Gets the characters that are allowed inside an identifier.
@@ -40,12 +50,57 @@ namespace Narser.API.Parser
         }
 
         /// <summary>
+        /// Prints an error to the console.
+        /// </summary>
+        /// <param name="output">The output.</param>
+        private void Error(string output)
+        {
+            if (string.IsNullOrWhiteSpace(output))
+                throw new ArgumentNullException(nameof(output));
+
+            Console.WriteLine($"[{DateTime.Now.ToShortTimeString()}]\t{GetLocation()}\t{output}");
+        }
+
+        /// <summary>
+        /// Prints an expectancy error to the console.
+        /// </summary>
+        /// <param name="unexpected">The unexpected character.</param>
+        /// <param name="expected">The expected character.</param>
+        private void ExpectError(char unexpected, char expected)
+        {
+            Error($"Unexpected character '{unexpected}'; expected '{expected}'.");
+        }
+
+        /// <summary>
+        /// Adds a token to the <see cref="Lexer"/> results.
+        /// </summary>
+        /// <param name="kind">The token kind to add.</param>
+        /// <param name="location">The location of the token.</param>
+        /// <param name="read">Whether to read after adding.</param>
+        private void Add(TokenKind kind, StringLocation location, bool read = true)
+        {
+            Tokens.Enqueue(Token.Create(kind, location));
+
+            if (read)
+                Read();
+        }
+
+        /// <summary>
+        /// Adds a token to the <see cref="Lexer"/> results.
+        /// </summary>
+        /// <param name="kind">The token to add.</param>
+        /// <param name="read">Whether to read after the adding.</param>
+        private void Add(TokenKind kind, bool read = true)
+        {
+            Add(kind, GetLocation(), read);
+        }
+        
+        /// <summary>
         /// Tokenizes the input in the <see cref="Lexer"/>.
         /// </summary>
         /// <returns></returns>
-        public Queue<BaseToken> Tokenize()
+        public void Tokenize()
         {
-            var tokens = new Queue<Token<TokenKind>>();
             while (!IsAtEnd())
             {
                 while ((char) _reader.Peek() == ' ')
@@ -75,17 +130,13 @@ namespace Narser.API.Parser
 
                     case '§':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.SectionSign, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.SectionSign);
                         break;
                     }
 
                     case '!':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Exclamation, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Exclamation);
                         break;
                     }
 
@@ -94,101 +145,77 @@ namespace Narser.API.Parser
                         Token<TokenKind> literal = null;
                         if (ParseStringLiteral(ref literal))
                         {
-                            tokens.Enqueue(literal);
+                            Tokens.Enqueue(literal);
                             break;
                         }
 
-                        tokens.Enqueue(Token.Create(TokenKind.DoubleQuote, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.DoubleQuote);
                         break;
                     }
 
                     case '@':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.At, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.At);
                         break;
                     }
 
                     case '#':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.NumberSign, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.NumberSign);
                         break;
                     }
 
                     case '£':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Pound, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Pound);
                         break;
                     }
 
                     case '%':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Percent, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Percent);
                         break;
                     }
 
                     case '€':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Euro, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Euro);
                         break;
                     }
 
                     case '$':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Dollar, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Dollar);
                         break;
                     }
 
                     case '¤':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.CurrencySign, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.CurrencySign);
                         break;
                     }
 
                     case '&':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Ampersand, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Ampersand);
                         break;
                     }
 
                     case '/':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Slash, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Slash);
                         break;
                     }
 
                     case '{':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.RCurlyBrace, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.RCurlyBrace);
                         break;
                     }
 
                     case '(':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.RBrace, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.RBrace);
                         break;
                     }
 
@@ -197,93 +224,71 @@ namespace Narser.API.Parser
                         Token<TokenKind> literal = null;
                         if (ParseCharacterClass(ref literal))
                         {
-                            tokens.Enqueue(literal);
+                            Tokens.Enqueue(literal);
                             break;
                         }
 
-                        tokens.Enqueue(Token.Create(TokenKind.RSquareBrace, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.RSquareBrace);
                         break;
                     }
 
                     case ')':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.LBrace, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.LBrace);
                         break;
                     }
 
                     case ']':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.LSquareBrace, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.LSquareBrace);
                         break;
                     }
 
                     case '}':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.LCurlyBrace, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.LCurlyBrace);
                         break;
                     }
 
                     case '=':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Equals, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Equals);
                         break;
                     }
 
                     case '?':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.QuestionMark, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.QuestionMark);
                         break;
                     }
 
                     case '+':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Plus, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Plus);
                         break;
                     }
 
                     case '\\':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Backslash, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Backslash);
                         break;
                     }
 
                     case '´':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.DiacriticalMark, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.DiacriticalMark);
                         break;
                     }
 
                     case '`':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.GraveAccent, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.GraveAccent);
                         break;
                     }
 
                     case '^':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Caret, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Caret);
                         break;
                     }
 
@@ -292,85 +297,65 @@ namespace Narser.API.Parser
                         Token<TokenKind> literal = null;
                         if (ParseCharLiteral(ref literal))
                         {
-                            tokens.Enqueue(literal);
+                            Tokens.Enqueue(literal);
                             break;
                         }
 
-                        tokens.Enqueue(Token.Create(TokenKind.SingleQuote, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.SingleQuote);
                         break;
                     }
 
                     case '*':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Asterisk, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Asterisk);
                         break;
                     }
 
                     case ',':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Comma, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Comma);
                         break;
                     }
 
                     case ';':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Semicolon, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Semicolon);
                         break;
                     }
 
                     case '.':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Dot, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Dot);
                         break;
                     }
 
                     case '-':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Hyphen, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Hyphen);
                         break;
                     }
 
                     case '_':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Underscore, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Underscore);
                         break;
                     }
 
                     case '<':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.LessThan, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.LessThan);
                         break;
                     }
 
                     case '>':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.GreaterThan, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.GreaterThan);
                         break;
                     }
 
                     case '|':
                     {
-                        tokens.Enqueue(Token.Create(TokenKind.Pipe, GetLocation()));
-                        Read();
-
+                        Add(TokenKind.Pipe);
                         break;
                     }
 
@@ -381,7 +366,7 @@ namespace Narser.API.Parser
                             Token<TokenKind> keyword;
 
                             ParseKeyword(out keyword);
-                            tokens.Enqueue(keyword);
+                            Tokens.Enqueue(keyword);
 
                             break;
                         }
@@ -391,8 +376,6 @@ namespace Narser.API.Parser
                     }
                 }
             }
-
-            return tokens;
         }
 
         /// <summary>
@@ -407,6 +390,7 @@ namespace Narser.API.Parser
 
             Read();
 
+            var start = GetLocation();
             var sb = new StringBuilder();
 
             while (_reader.Peek() != '"')
@@ -414,9 +398,10 @@ namespace Narser.API.Parser
 
             Read();
 
-            output = new Token<TokenKind>(sb.ToString(), GetLocation(), TokenKind.StringLiteral)
+            output = new Token<TokenKind>(sb.ToString(), start, TokenKind.StringLiteral)
             {
-                Length = sb.Length
+                Length = sb.Length,
+                End = GetLocation()
             };
 
             return true;
@@ -427,23 +412,52 @@ namespace Narser.API.Parser
         /// </summary>
         /// <param name="output">The output token.</param>
         /// <returns></returns>
-        internal bool ParseCharLiteral(ref BaseToken output)
+        private bool ParseCharLiteral(ref BaseToken output)
         {
+            // Check if the declaration has a leading single-quote.
             if (_reader.Peek() != '\'')
                 return false;
 
             _reader.Read();
 
             var sb = new StringBuilder();
+            var start = GetLocation();
+            var isEscapeSequence = false;
 
+            // Check if the literal has a leading backslash.
+            if (_reader.Peek() == '\\')
+            {
+                isEscapeSequence = true;
+                _reader.Read();
+            }
+
+            // Read until it hits the last single-quote.
             while (_reader.Peek() != '\'')
                 sb.Append((char) Read());
 
+            if (isEscapeSequence)
+            {
+                if (sb.Length > 2 || !_escapeSequences.Contains(sb[0]))
+                {
+                    Error("Invalid escape sequence.");
+                    return false;
+                }
+            }
+            else
+            {
+                if (sb.Length > 1)
+                {
+                    Error("Too many characters in literal.");
+                    return false;
+                }
+            }
+
             Read();
 
-            output = new Token<TokenKind>(sb.ToString(), GetLocation(), TokenKind.CharLiteral)
+            output = new Token<TokenKind>(sb.ToString(), start, TokenKind.CharLiteral)
             {
-                Length = sb.Length    
+                Length = sb.Length,
+                End = GetLocation()
             };
 
             return true;
@@ -462,15 +476,17 @@ namespace Narser.API.Parser
             _reader.Read();
 
             var sb = new StringBuilder();
+            var start = GetLocation();
 
             while (_reader.Peek() != ']')
                 sb.Append((char) Read());
 
             Read();
 
-            output = new Token<TokenKind>(sb.ToString(), GetLocation(), TokenKind.CharacterClass)
+            output = new Token<TokenKind>(sb.ToString(), start, TokenKind.CharacterClass)
             {
-                Length = sb.Length
+                Length = sb.Length,
+                End = GetLocation()
             };
 
             return true;
