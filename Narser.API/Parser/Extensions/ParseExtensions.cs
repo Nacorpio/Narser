@@ -21,6 +21,12 @@ namespace Narser.API.Parser.Extensions
         /// <returns></returns>
         public static bool Parse(this TQueue queue, out ComponentBase output)
         {
+            if (queue == null)
+                throw new ArgumentNullException(nameof(queue));
+
+            if (queue.Count == 0)
+                throw new ArgumentException(nameof(queue));
+
             switch (queue.Peek().Kind)
             {
                 case TokenKind.StringLiteral:
@@ -128,6 +134,9 @@ namespace Narser.API.Parser.Extensions
             if (queue == null)
                 throw new ArgumentNullException(nameof(queue));
 
+            if (queue.Count == 0)
+                throw new ArgumentException(nameof(queue));
+
             if (queue.Count < 3)
             {
                 output = null;
@@ -162,6 +171,12 @@ namespace Narser.API.Parser.Extensions
         /// <returns></returns>
         public static bool Parse(this TQueue queue, out RuleDefDeclaration output)
         {
+            if (queue == null)
+                throw new ArgumentNullException(nameof(queue));
+
+            if (queue.Count == 0)
+                throw new ArgumentException(nameof(queue));
+
             var components = new Collection<ComponentBase>();
             ComponentBase component;
 
@@ -180,6 +195,12 @@ namespace Narser.API.Parser.Extensions
         /// <returns></returns>
         public static bool Parse(this TQueue queue, out IdentifierComponent output)
         {
+            if (queue == null)
+                throw new ArgumentNullException(nameof(queue));
+
+            if (queue.Count == 0)
+                throw new ArgumentNullException(nameof(queue));
+
             var start = queue.Peek();
             var isReference = queue.Peek().Kind == TokenKind.At;
 
@@ -209,6 +230,12 @@ namespace Narser.API.Parser.Extensions
         /// <returns></returns>
         public static bool Parse(this TQueue queue, out CharacterClassComponent output)
         {
+            if (queue == null)
+                throw new ArgumentNullException(nameof(queue));
+
+            if (queue.Count == 0)
+                throw new ArgumentException(nameof(queue));
+            
             if (queue.Peek().Kind != TokenKind.CharacterClass)
             {
                 output = null;
@@ -233,6 +260,12 @@ namespace Narser.API.Parser.Extensions
         /// <returns></returns>
         public static bool Parse(this TQueue queue, out StringLiteralComponent output)
         {
+            if (queue == null)
+                throw new ArgumentNullException(nameof(queue));
+
+            if (queue.Count == 0)
+                throw new ArgumentException(nameof(queue));
+
             if (queue.Peek().Kind != TokenKind.StringLiteral)
             {
                 output = null;
@@ -257,6 +290,12 @@ namespace Narser.API.Parser.Extensions
         /// <returns></returns>
         public static bool Parse(this TQueue queue, out CharLiteralComponent output)
         {
+            if (queue == null)
+                throw new ArgumentNullException(nameof(queue));
+
+            if (queue.Count == 0)
+                throw new ArgumentException(nameof(queue));
+
             if (queue.Peek().Kind != TokenKind.CharLiteral)
             {
                 output = null;
