@@ -15,10 +15,5 @@
         /// Gets the name of the <see cref="IdentifierComponent"/>.
         /// </summary>
         public string Name { get; internal set; }
-
-        /// <summary>
-        /// Gets whether the <see cref="IdentifierComponent"/> is a reference.
-        /// </summary>
-        public bool IsReference { get; internal set; }
     }
 }

@@ -37,7 +37,7 @@ namespace Narser.API.Parser.Syntax.Declarations
         public bool IsBinaryComponent()
         {
             var array = _components.ToArray();
-            return array.Length == 3 && array[0] is OperatorComponent;
+            return array.Length == 3 && array[1] is OperatorComponent;
         }
 
         /// <summary>

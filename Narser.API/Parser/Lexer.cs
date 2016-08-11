@@ -385,7 +385,7 @@ namespace Narser.API.Parser
         /// <returns></returns>
         internal bool ParseStringLiteral(ref BaseToken output)
         {
-            if (_reader.Peek() != '\"')
+            if (_reader.Peek() != '"')
                 return false;
 
             Read();

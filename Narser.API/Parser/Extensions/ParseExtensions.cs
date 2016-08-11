@@ -19,7 +19,7 @@ namespace Narser.API.Parser.Extensions
         /// <param name="queue">A queue of tokens.</param>
         /// <param name="output">The resulting component.</param>
         /// <returns></returns>
-        public static bool Parse(this TQueue queue, out ComponentBase output)
+        public static bool Parse(this TQueue queue, ref ComponentBase output)
         {
             if (queue == null)
                 throw new ArgumentNullException(nameof(queue));
@@ -27,107 +27,128 @@ namespace Narser.API.Parser.Extensions
             if (queue.Count == 0)
                 throw new ArgumentException(nameof(queue));
 
+            if (queue.Peek().Kind == TokenKind.RBrace)
+                queue.Dequeue();
+
             switch (queue.Peek().Kind)
             {
                 case TokenKind.StringLiteral:
-                {
-                    StringLiteralComponent component;
-                    if (!Parse(queue, out component))
                     {
-                        output = null;
-                        return false;
-                    }
+                        StringLiteralComponent component;
+                        if (!Parse(queue, out component))
+                        {
+                            output = null;
+                            return false;
+                        }
 
-                    output = component;
-                    return true;
-                }
+                        output = component;
+                        return true;
+                    }
 
                 case TokenKind.CharLiteral:
-                {
-                    CharLiteralComponent component;
-                    if (!Parse(queue, out component))
                     {
-                        output = null;
-                        return false;
-                    }
+                        CharLiteralComponent component;
+                        if (!Parse(queue, out component))
+                        {
+                            output = null;
+                            return false;
+                        }
 
-                    output = component;
-                    return true;
-                }
+                        output = component;
+                        return true;
+                    }
 
                 case TokenKind.CharacterClass:
-                {
-                    CharacterClassComponent component;
-                    if (!Parse(queue, out component))
                     {
-                        output = null;
-                        return false;
+                        CharacterClassComponent component;
+                        if (!Parse(queue, out component))
+                        {
+                            output = null;
+                            return false;
+                        }
+
+                        output = component;
+                        return true;
                     }
-
-                    output = component;
-                    return true;
-                }
-
-                case TokenKind.At:
-                {
-                    IdentifierComponent component;
-                    if (!Parse(queue, out component))
-                    {
-                        output = null;
-                        return false;
-                    }
-
-                    output = component;
-                    return true;
-                }
 
                 case TokenKind.Identifier:
-                {
-                    IdentifierComponent component;
-                    if (!Parse(queue, out component))
                     {
-                        output = null;
-                        return false;
-                    }
-
-                    output = component;
-                    return true;
-                }
-
-                default:
-                {
-                    switch (queue.Peek().Kind)
-                    {
-                        case TokenKind.Pipe:
+                        IdentifierComponent identifierComponent;
+                        if (!Parse(queue, out identifierComponent))
                         {
-                            output = new OperatorComponent(OperatorType.BitwiseOr);
-                            queue.Dequeue();
-
-                            return true;
+                            output = null;
+                            return false;
                         }
 
-                        case TokenKind.Ampersand:
-                        {
-                            output = new OperatorComponent(OperatorType.BitwiseAnd);
-                            queue.Dequeue();
-
-                            return true;
-                        }
+                        output = identifierComponent;
+                        break;
                     }
 
-                    break;
-                }
+                case TokenKind.Pipe:
+                    {
+                        output = new OperatorComponent(OperatorType.BitwiseOr);
+                        queue.Dequeue();
+                        break;
+                    }
+
+                case TokenKind.Ampersand:
+                    {
+                        output = new OperatorComponent(OperatorType.BitwiseAnd);
+                        queue.Dequeue();
+                        break;
+                    }
             }
 
-            output = null;
-            return false;
+            if (queue.Peek().Kind == TokenKind.LBrace)
+                queue.Dequeue();
+
+            return true;
         }
 
         /// <summary>
         /// Parses a binary expression component using the specific token queue.
         /// </summary>
         /// <param name="queue">A queue of tokens.</param>
-        /// <param name="output">The resulting binary expression component.</param>
+        /// <param name="component">The resulting binary component.</param>
+        /// <returns></returns>
+        private static bool Parse(TQueue queue, out BinaryComponent component)
+        {
+            if (queue == null)
+                throw new ArgumentNullException(nameof(queue));
+
+            if (queue.Count == 0)
+                throw new ArgumentException(nameof(queue));
+
+            ComponentBase left = null;
+            if (!Parse(queue, ref left))
+            {
+                component = null;
+                return false;
+            }
+
+            ComponentBase @operator = null;
+            if (!Parse(queue, ref @operator))
+            {
+                component = null;
+                return false;
+            }
+
+            ComponentBase right = null;
+            if (!Parse(queue, ref right))
+            {
+                component = null;
+                return false;
+            }
+
+            component = null;
+            return true;
+        }
+
+        /// <summary>
+        /// Parses a binary expression component using the specific component queue.
+        /// </summary>
+        /// <param name="queue">A queue of components.</param>
+        /// <param name="output">The resulting binary component.</param>
         /// <returns></returns>
         public static bool Parse(this Queue<ComponentBase> queue, out BinaryComponent output)
         {
@@ -157,7 +178,7 @@ namespace Narser.API.Parser.Extensions
 
             output = new BinaryComponent(left, op, right)
             {
-               Token = start
+                Token = start
             };
 
             return true;
@@ -178,9 +199,9 @@ namespace Narser.API.Parser.Extensions
                 throw new ArgumentException(nameof(queue));
 
             var components = new Collection<ComponentBase>();
-            ComponentBase component;
+            ComponentBase component = null;
 
-            while (queue.Count > 0 && queue.Parse(out component))
+            while (queue.Count > 0 && queue.Parse(ref component))
                 components.Add(component);
 
             output = new RuleDefDeclaration(components);
@@ -202,11 +223,6 @@ namespace Narser.API.Parser.Extensions
                 throw new ArgumentNullException(nameof(queue));
 
             var start = queue.Peek();
-            var isReference = queue.Peek().Kind == TokenKind.At;
-
-            if (isReference)
-                queue.Dequeue();
-
             if (queue.Peek().Kind != TokenKind.Identifier)
             {
                 output = null;
@@ -215,13 +231,12 @@ namespace Narser.API.Parser.Extensions
 
             output = new IdentifierComponent((string) queue.Dequeue().Value)
             {
-                Token = start,
-                IsReference = isReference
+                Token = start
             };
 
             return true;
         }
-        
+
         /// <summary>
         /// Parses a character class component using the specific token queue.
         /// </summary>
@@ -235,7 +250,7 @@ namespace Narser.API.Parser.Extensions
 
             if (queue.Count == 0)
                 throw new ArgumentException(nameof(queue));
-            
+
             if (queue.Peek().Kind != TokenKind.CharacterClass)
             {
                 output = null;

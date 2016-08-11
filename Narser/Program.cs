@@ -22,11 +22,8 @@ namespace Narser
             var builder = new SyntaxBuilder(lexer.Tokens);
             var nodes = builder.Build();
 
-            var syntax = (SyntaxDefNode) nodes.FirstOrDefault(x => x is SyntaxDefNode);
-            var tokens = nodes.Where(x => x is TokenDefNode).Cast<TokenDefNode>()
-                .ToArray();
-
-            var ruleAod = syntax?["alpha-or-digit"];
+            var syntaxDef = (SyntaxDefNode) nodes.FirstOrDefault(x => x is SyntaxDefNode);
+            var alpha = syntaxDef?["alpha"].GetDeclaration();
 
             Console.ReadLine();
         }
