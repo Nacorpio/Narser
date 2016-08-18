@@ -40,18 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Parser\Extensions\ParseExtensions.cs" />
     <Compile Include="Parser\Lexer.cs" />
-    <Compile Include="Parser\Syntax\Declarations\Components\Compounds\BinaryComponent.cs" />
-    <Compile Include="Parser\Syntax\Declarations\Components\CharacterClassComponent.cs" />
-    <Compile Include="Parser\Syntax\Declarations\Components\CharLiteralComponent.cs" />
-    <Compile Include="Parser\Syntax\Declarations\Components\ComponentBase.cs" />
-    <Compile Include="Parser\Syntax\Declarations\Components\Compounds\CompoundComponent.cs" />
-    <Compile Include="Parser\Syntax\Declarations\Components\IdentifierComponent.cs" />
-    <Compile Include="Parser\Syntax\Declarations\Components\OperatorComponent.cs" />
-    <Compile Include="Parser\Syntax\Declarations\Components\StringLiteralComponent.cs" />
-    <Compile Include="Parser\Syntax\Declarations\DeclarationBase.cs" />
-    <Compile Include="Parser\Syntax\Declarations\RuleDefDeclaration.cs" />
     <Compile Include="Parser\Syntax\Nodes\RuleDefNode.cs" />
     <Compile Include="Parser\Syntax\Nodes\SyntaxDefNode.cs" />
     <Compile Include="Parser\Syntax\Nodes\SyntaxNode.cs" />
@@ -61,6 +50,10 @@
     <Compile Include="Parser\Utilities\StringLocation.cs" />
     <Compile Include="Parser\Token.cs" />
     <Compile Include="Parser\TokenKind.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Parser\Extensions\" />
+    <Folder Include="Parser\Syntax\Declarations\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

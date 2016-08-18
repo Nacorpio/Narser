@@ -8,7 +8,7 @@ using BaseToken = Narser.API.Parser.Token<Narser.API.Parser.TokenKind>;
 
 namespace Narser.API.Parser
 {
-    public class Lexer
+    public class Lexer : IDisposable
     {
         private readonly char[] _escapeSequences = {'n', 'r', 'a', 'b', 'f', 't', 'v', '\'', '"', '\\', '?'};
 
@@ -560,6 +560,14 @@ namespace Narser.API.Parser
         public bool IsAtEnd()
         {
             return _reader.Peek() == -1;
+        }
+
+        /// <summary>
+        /// Disposes the <see cref="Lexer"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            _reader.Dispose();
         }
     }
 }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Narser.API.Parser.Extensions;
-using Narser.API.Parser.Syntax.Declarations;
 using Narser.API.Parser.Syntax.Nodes;
 
 namespace Narser.API.Parser.Syntax
@@ -205,10 +203,7 @@ namespace Narser.API.Parser.Syntax
 
             Next();
 
-            RuleDefDeclaration decl;
-            tokens.Parse(out decl);
-
-            output = new RuleDefNode(name, decl, start)
+            output = new RuleDefNode(name, tokens, start)
             {
                 Parent = parent,
                 Token = start
